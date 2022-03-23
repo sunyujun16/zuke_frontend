@@ -14,14 +14,15 @@
       <input id="search_input" type="text" placeholder="请输入要搜索的关键词">
     </label>
 
-    <!--  main button-->
-    <div :class='{tag_active: isActiveMain, tag_default:true}'>
+    <!--  main button
+    两个class属性：tag_active取决于isActiveMain的真假，tag_default默认为true, 所以‘.tag_default{}'的CSS属性持续有效-->
+    <div :class='{tag_active: isActiveMain, tag_default:true}' @click="pushToMainList">
       <span class="header-text">首页</span>
     </div>
-    <div :class='{tag_active: isActiveMap, tag_default:true}'>
+    <div :class='{tag_active: isActiveMap, tag_default:true}' @click="pushToMapList">
       <span class="header-text">地图找房</span>
     </div>
-    <div :class='{tag_active: isActiveMine, tag_default:true}'>
+    <div :class='{tag_active: isActiveMine, tag_default:true}' @click="pushToMineList">
       <span class="header-text">个人中心</span>
     </div>
 
@@ -49,7 +50,34 @@ export default {
   },
   computed: {
     ...mapState('headerOptions',['isActiveMain','isActiveMap','isActiveMine']),
-    ...mapMutations('headerOptions',['SET_MAIN','SET_MAP','SET_MINE'])
+
+  },
+  methods: {
+    ...mapMutations('headerOptions',['SET_MAIN','SET_MAP','SET_MINE']),
+    pushToMainList(){
+      if (!this.isActiveMain){
+        this.SET_MAIN(true);
+        this.SET_MAP(false);
+        this.SET_MINE(false);
+        this.$router.push('/');
+      }
+    },
+    pushToMapList(){
+      if (!this.isActiveMap){
+        this.SET_MAIN(false);
+        this.SET_MAP(true);
+        this.SET_MINE(false);
+        this.$router.push('map_list');
+      }
+    },
+    pushToMineList(){
+      if (!this.isActiveMine){
+        this.SET_MAIN(false);
+        this.SET_MAP(false);
+        this.SET_MINE(true);
+        this.$router.push('mine');
+      }
+    }
   }
 }
 </script>

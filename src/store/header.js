@@ -16,8 +16,8 @@ const headerOptions = {
 
     },
     state: {
-        isActiveMain: false,
-        isActiveMap: true,
+        isActiveMain: true,
+        isActiveMap: false,
         isActiveMine: false,
     },
     getters: {

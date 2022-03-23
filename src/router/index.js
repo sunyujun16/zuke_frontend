@@ -2,8 +2,9 @@ import Vue from "vue";
 import VueRouter from "vue-router";
 Vue.use(VueRouter);
 
-
 import WelcomePage from "@/views/WelcomePage";
+import map_list from "@/router/map_list";
+import mine_about from "@/router/mine_about";
 
 export default new VueRouter({
     routes:[
@@ -11,16 +12,12 @@ export default new VueRouter({
             path:'/',
             name:'main',
             components:{
-                WelcomePage // 注意这里是缩写方式，<router-view> 的name和组件名必须一致。
+                WelcomePage, // 注意这里的简写方式，前提：<router-view name='WelcomePage'>
             }
         },
-        {
-            path: '/welcome',
-            name: 'welcome',
-            components:{
-                WelcomePage
-            }
-        }
+        map_list,
+        mine_about,
+
     ]
 
 })
