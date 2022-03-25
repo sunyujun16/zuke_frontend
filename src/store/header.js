@@ -1,4 +1,4 @@
-const headerOptions = {
+export default {
     namespaced:true,
     actions: {
 
@@ -24,5 +24,3 @@ const headerOptions = {
 
     }
 }
-
-export default headerOptions;

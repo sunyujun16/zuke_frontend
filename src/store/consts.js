@@ -8,7 +8,8 @@ export default {
 
     },
     state: {
-        serverHostName: 'https://sunyujun.com/zuke/#'
+        // serverHostName: 'https://sunyujun.com/zuke/#'
+        serverHostName: 'http://localhost:8080/#'
     },
     getters: {
 

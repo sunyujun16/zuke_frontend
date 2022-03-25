@@ -29,5 +29,10 @@ export default {
   text-align: center;
   color: #2c3e50;
   margin-top: 0;
+  min-width: 998px;
+}
+
+.el-message {
+  opacity: 0.91;
 }
 </style>

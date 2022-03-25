@@ -2,8 +2,8 @@ import Vue from 'vue'
 import App from './App.vue'
 
 
-import ElementUI from './elements/index'
-Vue.use(ElementUI)
+import elements from './elements/index'
+Vue.use(elements)
 
 // 引入路由器
 import router from '@/router/index'
@@ -12,6 +12,9 @@ import store from '@/store/index'
 // axios
 import axios from "@/axios/index";
 Vue.prototype.$axios = axios
+
+import utils from '@/utils/index'
+Vue.use(utils)
 
 Vue.config.productionTip = false
 

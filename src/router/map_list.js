@@ -6,7 +6,7 @@ export default {
     path: '/map_list',
     name: 'map_list',
     components: {
+        map_page: MapPage,
         community_list: CommunityList,
-        map_page: MapPage
     }
 }

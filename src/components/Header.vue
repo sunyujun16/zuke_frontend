@@ -8,10 +8,13 @@
       <span class="text-position" style="float: left">beijing</span>
     </div>
 
+
     <!--  icon + search-->
-    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png">
+<!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
+    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">
+    <a ref="fucka" :href="fuck" style="float: left" target="_blank" v-show="false"></a>
     <label for="search_input">
-      <input id="search_input" type="text" placeholder="请输入要搜索的关键词">
+      <input id="search_input" type="text" placeholder="请输入要搜索的关键词" v-model="searchValue">
     </label>
 
     <!--  main button
@@ -45,38 +48,42 @@ export default {
   name: "Header",
   data() {
     return {
-
+      searchValue: '',
+      fuck: 'http://localhost:8080/#/map_list',
     }
   },
   computed: {
-    ...mapState('headerOptions',['isActiveMain','isActiveMap','isActiveMine']),
+    ...mapState('headerStore',['isActiveMain','isActiveMap','isActiveMine']),
 
   },
   methods: {
-    ...mapMutations('headerOptions',['SET_MAIN','SET_MAP','SET_MINE']),
+    ...mapMutations('headerStore',['SET_MAIN','SET_MAP','SET_MINE']),
     pushToMainList(){
       if (!this.isActiveMain){
-        this.SET_MAIN(true);
-        this.SET_MAP(false);
-        this.SET_MINE(false);
         this.$router.push('/');
       }
     },
     pushToMapList(){
       if (!this.isActiveMap){
-        this.SET_MAIN(false);
-        this.SET_MAP(true);
-        this.SET_MINE(false);
         this.$router.push('map_list');
       }
     },
     pushToMineList(){
       if (!this.isActiveMine){
-        this.SET_MAIN(false);
-        this.SET_MAP(false);
-        this.SET_MINE(true);
         this.$router.push('mine');
       }
+    },
+    doSearch(e, searchValue){
+      // 其实没必要传参, 直接通过this获取即可, 此处纯属娱乐。
+      // 新建页面，导航到detail页面，带1个参数--小区id，detail页面beforeMount之时，axios或jQuery向后端请求小区信息，不要keep-alive(暂定)
+
+
+    },
+    tempTest(){
+      let target = this.$refs.fucka
+      this.fuck = this.$store.state.constsStore.serverHostName + '/map_list'
+      // target.setAttribute('href', window.location.origin + '/map_list')
+      target.click()
     }
   }
 }
@@ -84,14 +91,14 @@ export default {
 
 <style scoped>
 .zuke-header {
-  min-width: 998px;
+  /*min-width: 998px;*/
   width: 100%;
   background-color: #BBAB95;
   height: 60px;
   margin-top: 0;
   margin-bottom: 0;
   box-shadow: 0 3px 3px rgba(100, 100, 100, 0.7);
-  z-index: 0;
+  z-index: 400;
 }
 
 #zuke_logo {
@@ -129,10 +136,22 @@ export default {
 }
 
 #search_ico {
+  padding: 8px;
   float: left;
   height: 30%;
   margin-left: 12%;
-  margin-top: 1.1%;
+  margin-top: 0.85%;
+  margin-right: -0.2%;
+  border-radius: 5px;
+}
+#search_ico:hover {
+  margin-right: -0.3%;
+  height: 33%;
+  /*box-shadow: 2px 2px 2px black;*/
+}
+#search_ico:active {
+
+  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.3), inset -1px -1px 1px rgba(159,143,124,0.8);
 }
 
 #search_input {
