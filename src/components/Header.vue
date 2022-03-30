@@ -10,7 +10,7 @@
 
 
     <!--  icon + search-->
-<!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
+    <!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
     <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">
     <a ref="fucka" :href="fuck" style="float: left" target="_blank" v-show="false"></a>
     <label for="search_input">
@@ -53,33 +53,33 @@ export default {
     }
   },
   computed: {
-    ...mapState('headerStore',['isActiveMain','isActiveMap','isActiveMine']),
+    ...mapState('headerStore', ['isActiveMain', 'isActiveMap', 'isActiveMine']),
 
   },
   methods: {
-    ...mapMutations('headerStore',['SET_MAIN','SET_MAP','SET_MINE']),
-    pushToMainList(){
-      if (!this.isActiveMain){
+    ...mapMutations('headerStore', ['SET_MAIN', 'SET_MAP', 'SET_MINE']),
+    pushToMainList() {
+      if (!this.isActiveMain) {
         this.$router.push('/');
       }
     },
-    pushToMapList(){
-      if (!this.isActiveMap){
-        this.$router.push('map_list');
+    pushToMapList() {
+      if (!this.isActiveMap) {
+        this.$router.push('/map_list');
       }
     },
-    pushToMineList(){
-      if (!this.isActiveMine){
-        this.$router.push('mine');
+    pushToMineList() {
+      if (!this.isActiveMine) {
+        this.$router.push('/mine');
       }
     },
-    doSearch(e, searchValue){
+    doSearch(e, searchValue) {
       // 其实没必要传参, 直接通过this获取即可, 此处纯属娱乐。
       // 新建页面，导航到detail页面，带1个参数--小区id，detail页面beforeMount之时，axios或jQuery向后端请求小区信息，不要keep-alive(暂定)
 
 
     },
-    tempTest(){
+    tempTest() {
       let target = this.$refs.fucka
       this.fuck = this.$store.state.constsStore.serverHostName + '/map_list'
       // target.setAttribute('href', window.location.origin + '/map_list')
@@ -92,12 +92,13 @@ export default {
 <style scoped>
 .zuke-header {
   /*min-width: 998px;*/
+  /*opacity: 0.95;*/
   width: 100%;
-  background-color: #BBAB95;
+  background-color: rgba(187, 171, 149, 1);
   height: 60px;
   margin-top: 0;
   margin-bottom: 0;
-  box-shadow: 0 3px 3px rgba(100, 100, 100, 0.7);
+  box-shadow: 0 3px 3px rgba(100, 100, 100, 0.3);
   z-index: 400;
 }
 
@@ -144,14 +145,16 @@ export default {
   margin-right: -0.2%;
   border-radius: 5px;
 }
+
 #search_ico:hover {
   margin-right: -0.3%;
   height: 33%;
   /*box-shadow: 2px 2px 2px black;*/
 }
+
 #search_ico:active {
 
-  box-shadow: inset 1px 1px 1px rgba(0,0,0,0.3), inset -1px -1px 1px rgba(159,143,124,0.8);
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3), inset -1px -1px 1px rgba(159, 143, 124, 0.8);
 }
 
 #search_input {
@@ -179,7 +182,7 @@ export default {
 }
 
 .tag_active {
-  background-color: #9f8f7c;
+  background-color: rgba(159,143,124,0.6);
 }
 
 .header-text {
@@ -191,7 +194,7 @@ export default {
   font-size: 15px;
   text-align: center;
   /*margin-top: 20%;*/
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
   user-select: none;
   transition: all 0.1s;
   /*#9f8f7c*/
@@ -199,15 +202,16 @@ export default {
 }
 
 .header-text:hover {
-  font-weight: bold;
+  /*font-weight: bold;*/
   cursor: default;
+  background-color: rgba(159,143,124,0.4);
   transition: all 0.1s;
 }
 
 .header-text:active {
-  font-weight: bold;
+  /*font-weight: bold;*/
   cursor: default;
-  background-color: #9f8f7c;
+  background-color: rgba(159,143,124,0.6);
   transition: all 0.1s;
 }
 

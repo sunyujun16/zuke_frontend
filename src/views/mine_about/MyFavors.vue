@@ -1,5 +1,7 @@
 <template>
-
+<div>
+  老子的收藏
+</div>
 </template>
 
 <script>

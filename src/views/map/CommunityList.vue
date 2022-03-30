@@ -2,20 +2,7 @@
   <div class="community-container">
     <transition name="community-show" appear>
       <div class="community-list" v-show="showList">
-        <div class="zuke-community-item">
-          <img class="community-small-img" src="@/assets/img/demos/ted-small.jpg" alt="demo_img">
-
-          <div style="clear: left"></div>
-        </div>
-        <div class="zuke-community-item">0</div>
-        <div class="zuke-community-item"></div>
-        <div class="zuke-community-item">1</div>
-        <div class="zuke-community-item"></div>
-        <div class="zuke-community-item">2</div>
-        <div class="zuke-community-item"></div>
-        <div class="zuke-community-item">3</div>
-        <div class="zuke-community-item"></div>
-        <div class="zuke-community-item">4</div>
+        <CommunityInfoCard v-for="community in community_list" :community="community" :key="community.id"/>
       </div>
 
     </transition>
@@ -27,12 +14,16 @@
 </template>
 
 <script>
+import CommunityInfoCard from "@/views/map/CommunityInfoCard";
+
 export default {
   name: "CommunityList",
+  components: {CommunityInfoCard,},
   data() {
     return {
       showList: true,
-      buttonClass: 'zuke-community-side-button-r'
+      buttonClass: 'zuke-community-side-button-r',
+      community_list: [0,1,2,3,4,5,6,7,8,9], // 占位用，待连接数据库
     }
   },
   beforeMount() {
@@ -52,7 +43,6 @@ export default {
           setTimeout(() => {
             element.value = '>';
           }, 300)
-
           break;
         case true:
           this.buttonClass = 'zuke-community-side-button-r';
@@ -72,9 +62,9 @@ export default {
 .community-list {
   /*float: left;*/
   position: fixed;
-  width: 20%;
+  width: 520px;
   min-width: 300px;
-  height: 84%;
+  height: 85%;
   background-color: rgba(245, 245, 245, 0.8);
   z-index: -100;
   padding-top: 6px;
@@ -106,19 +96,11 @@ export default {
   -webkit-box-shadow: inset 0 0 2px rgba(204, 196, 153, 0.3);
 }
 
-.zuke-community-item {
-  margin-top: 20px;
-  height: 150px;
-  width: 90%;
-  margin-left: 5%;
-  background-color: lightblue;
-  border: solid 1px red;
-}
 
 /* button相关样式 注意transition属性的时间和list整体(下面的transform样式)要配合好*/
 .zuke-community-side-button-r {
   position: fixed;
-  left: 20%;
+  left: 520px;
   top: 46%;
   height: 100px;
   opacity: 0.8;
@@ -166,12 +148,6 @@ export default {
   transform: translateX(0);
 }
 
-/* 左侧边栏里面的小区缩略图相关设置 */
-.community-small-img {
-  float: left;
-  height: 100%;
-  border-right: solid 1px crimson;
-}
 
 
 </style>

@@ -1,6 +1,8 @@
 <template>
   <div id="app">
-<!--    <img alt="Vue logo" src="./assets/zuke_logo.png">-->
+    <!--    <img alt="Vue logo" src="./assets/zuke_logo.png">-->
+    <img src="./assets/img/background/nasa-Q1p7bh3SHj8-unsplash-narrow.jpg" alt="nah" class="header-background-img">
+
     <Header/>
 
     <MainPart/>
@@ -30,6 +32,17 @@ export default {
   color: #2c3e50;
   margin-top: 0;
   min-width: 998px;
+}
+
+.header-background-img {
+  opacity: 1;
+  top: 0;
+  left: 0;
+  z-index: -1; /*img背景关键属性*/
+  position: absolute; /*img背景关键属性*/
+  width: 100%;
+  height: 60px;
+  object-fit: cover; /*img背景关键属性*/
 }
 
 .el-message {

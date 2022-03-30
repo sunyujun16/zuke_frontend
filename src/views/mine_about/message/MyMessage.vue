@@ -1,10 +1,12 @@
 <template>
-<div>老子的特殊服务</div>
+  <div>
+    这是我的消息
+  </div>
 </template>
 
 <script>
 export default {
-  name: "MyService"
+  name: "MyMessage"
 }
 </script>
 

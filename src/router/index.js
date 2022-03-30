@@ -5,6 +5,7 @@ Vue.use(VueRouter);
 import WelcomePage from "@/views/WelcomePage";
 import map_list from "@/router/map_list";
 import mine_about from "@/router/mine_about";
+import detail from "@/router/detail";
 
 export default new VueRouter({
     routes:[
@@ -17,6 +18,8 @@ export default new VueRouter({
         },
         map_list,
         mine_about,
+        detail,
+
 
     ]
 
