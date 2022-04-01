@@ -64,6 +64,7 @@ export default {
     ...mapMutations('headerStore', ['SET_MAP', 'SET_MAIN', 'SET_MINE']),
     ...mapMutations('detailsStore', ['SET_ACTIVE_TAG_NAME']),
     toggleTag(tagName) {
+      // 其实没必要放store里面，因为只有本组件在用这些tagName。唔...是个经验。
       console.log('- ' + tagName.toUpperCase() + ' - tag clicked.')
       if (this.activeTagName !== tagName){
         this.SET_ACTIVE_TAG_NAME(tagName)

@@ -2,10 +2,10 @@
   <div id="app">
     <!--    <img alt="Vue logo" src="./assets/zuke_logo.png">-->
     <img src="./assets/img/background/nasa-Q1p7bh3SHj8-unsplash-narrow.jpg" alt="nah" class="header-background-img">
-
     <Header/>
-
-    <MainPart/>
+    <div>
+      <MainPart/>
+    </div>
 
   </div>
 </template>

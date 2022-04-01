@@ -93,13 +93,14 @@ export default {
 .zuke-header {
   /*min-width: 998px;*/
   /*opacity: 0.95;*/
+  /*position: fixed;*/
   width: 100%;
   background-color: rgba(187, 171, 149, 1);
   height: 60px;
-  margin-top: 0;
-  margin-bottom: 0;
+  top: 0;
+  left: 0;
   box-shadow: 0 3px 3px rgba(100, 100, 100, 0.3);
-  z-index: 400;
+  z-index: 4000;
 }
 
 #zuke_logo {
