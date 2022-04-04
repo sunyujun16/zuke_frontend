@@ -1,44 +1,47 @@
 <template>
-  <div class="zuke-header">
-    <!--  logo-->
-    <img id="zuke_logo" alt="Vue logo" src="../assets/img/zuke_logo.png">
-    <!--  icon + position-->
-    <img id="position_icon" alt="position-icon" src="../assets/img/header/position.png">
-    <div class="tag_position">
-      <span class="text-position" style="float: left">beijing</span>
+  <div>
+    <div class="zuke-header">
+      <!--  logo-->
+      <img id="zuke_logo" alt="Vue logo" src="../assets/img/zuke_logo.png">
+      <!--  icon + position-->
+      <img id="position_icon" alt="position-icon" src="../assets/img/header/position.png">
+      <div class="tag_position">
+        <span class="text-position" style="float: left">beijing</span>
+      </div>
+
+
+      <!--  icon + search-->
+      <!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
+      <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">
+      <a ref="fucka" :href="fuck" style="float: left" target="_blank" v-show="false"></a>
+      <label for="search_input">
+        <input id="search_input" type="text" placeholder="请输入要搜索的关键词" v-model="searchValue">
+      </label>
+
+      <!--  main button
+      两个class属性：tag_active取决于isActiveMain的真假，tag_default默认为true, 所以‘.tag_default{}'的CSS属性持续有效-->
+      <div :class='{tag_active: isActiveMain, tag_default:true}' @click="pushToMainList">
+        <span class="header-text">首页</span>
+      </div>
+      <div :class='{tag_active: isActiveMap, tag_default:true}' @click="pushToMapList">
+        <span class="header-text">地图找房</span>
+      </div>
+      <div :class='{tag_active: isActiveMine, tag_default:true}' @click="pushToMineList">
+        <span class="header-text">个人中心</span>
+      </div>
+
+      <!--  map search button-->
+
+      <!--  personal center button-->
+
+      <!--  avatar button + downside_bar-->
+      <img id="avatar_ico" alt="avatar-icon" src="../assets/img/header/avatar.png">
+
+      <div style="clear: both"></div>
     </div>
-
-
-    <!--  icon + search-->
-    <!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
-    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">
-    <a ref="fucka" :href="fuck" style="float: left" target="_blank" v-show="false"></a>
-    <label for="search_input">
-      <input id="search_input" type="text" placeholder="请输入要搜索的关键词" v-model="searchValue">
-    </label>
-
-    <!--  main button
-    两个class属性：tag_active取决于isActiveMain的真假，tag_default默认为true, 所以‘.tag_default{}'的CSS属性持续有效-->
-    <div :class='{tag_active: isActiveMain, tag_default:true}' @click="pushToMainList">
-      <span class="header-text">首页</span>
-    </div>
-    <div :class='{tag_active: isActiveMap, tag_default:true}' @click="pushToMapList">
-      <span class="header-text">地图找房</span>
-    </div>
-    <div :class='{tag_active: isActiveMine, tag_default:true}' @click="pushToMineList">
-      <span class="header-text">个人中心</span>
-    </div>
-
-    <!--  map search button-->
-
-    <!--  personal center button-->
-
-    <!--  avatar button + downside_bar-->
-    <img id="avatar_ico" alt="avatar-icon" src="../assets/img/header/avatar.png">
-
-
-    <div style="clear: both"></div>
+    <div class="zuke-header-position"></div>
   </div>
+
 </template>
 
 <script>
@@ -93,7 +96,7 @@ export default {
 .zuke-header {
   /*min-width: 998px;*/
   /*opacity: 0.95;*/
-  /*position: fixed;*/
+  position: absolute;
   width: 100%;
   background-color: rgba(187, 171, 149, 1);
   height: 60px;
@@ -101,6 +104,15 @@ export default {
   left: 0;
   box-shadow: 0 3px 3px rgba(100, 100, 100, 0.3);
   z-index: 4000;
+}
+
+.zuke-header-position {
+  width: 100%;
+  background-color: rgba(187, 171, 149, 0);
+  height: 60px;
+  top: 0;
+  left: 0;
+  z-index: 0;
 }
 
 #zuke_logo {
@@ -183,7 +195,7 @@ export default {
 }
 
 .tag_active {
-  background-color: rgba(159,143,124,0.6);
+  background-color: rgba(159, 143, 124, 0.6);
 }
 
 .header-text {
@@ -205,14 +217,14 @@ export default {
 .header-text:hover {
   /*font-weight: bold;*/
   cursor: default;
-  background-color: rgba(159,143,124,0.4);
+  background-color: rgba(159, 143, 124, 0.4);
   transition: all 0.1s;
 }
 
 .header-text:active {
   /*font-weight: bold;*/
   cursor: default;
-  background-color: rgba(159,143,124,0.6);
+  background-color: rgba(159, 143, 124, 0.6);
   transition: all 0.1s;
 }
 

@@ -4,6 +4,9 @@ import MyFavors from "@/views/mine_about/MyFavors";
 import MyComments from "@/views/mine_about/MyComments";
 import MySettings from "@/views/mine_about/MySettings";
 import MyService from "@/views/mine_about/MyService";
+import ReplyMe from "@/views/mine_about/message/ReplyMe";
+import LikesMe from "@/views/mine_about/message/LikesMe";
+import PrivateMessage from "@/views/mine_about/message/PrivateMessage";
 
 export default {
     path: '/mine',
@@ -11,14 +14,39 @@ export default {
     components: {
         mine_page: MineCenter
     },
-    redirect:'/mine/message',
+    redirect:'/mine/message/reply_me',
     children: [
         {
             path: 'message',
             name: 'mine_message',
+            redirect: '/mine/message/reply_me',
             components: {
-                center_right: MyMessage
-            }
+                center_right: MyMessage,
+            },
+            children: [
+                {
+                    path: 'reply_me',
+                    name: 'reply_me',
+                    components:{
+                        my_message: ReplyMe
+                    }
+                },
+                {
+                    path: 'likes_me',
+                    name: 'likes_me',
+                    components:{
+                        my_message: LikesMe
+                    }
+                },
+                {
+                    path: 'private_message',
+                    name: 'private_message',
+                    components:{
+                        my_message: PrivateMessage
+                    }
+                },
+
+            ]
         },
         {
             path: 'favors',

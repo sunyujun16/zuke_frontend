@@ -11,6 +11,9 @@ export default {
         },
         SET_ACTIVE_COMMENT_TAG_NAME(state, tagName){
             state.activeCommentTagName = tagName
+        },
+        SET_LAST_REPLY_VM(state, vm){
+            state.lastReplyVm = vm
         }
     },
     state: {
@@ -39,9 +42,11 @@ export default {
                     workoutFacility: false,
                 }
             },
+
             // comments: {} 这个应该做单独的查询，而不是放在pojo里面，独立的一张小区和评论的id映射表
             // ...
-        }
+        },
+        lastReplyVm: null,
     },
     getters: {
 

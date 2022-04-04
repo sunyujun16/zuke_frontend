@@ -1,6 +1,7 @@
 <template>
   <div class="mine-page">
     <div class="mine-left-bar">
+      <div style="height: 20px"></div>
       <div :class="{
         'mine-center-left-tag':true,
          'tag-active':activeTagName === 'message'
@@ -37,6 +38,7 @@
         <span class="zk-tag-text">客户服务</span>
       </div>
     </div>
+    <!-- 涵盖页面： LikesMe / ReplyMe / PrivateMessage 后台更新频繁，每次访问需更新数据-->
     <div class="mine-right-container">
       <router-view name="center_right"></router-view>
     </div>
@@ -66,29 +68,8 @@ export default {
     toggleTag(tagName) {
       // 其实没必要放store里面，因为只有本组件在用这些tagName。唔...是个经验。
       console.log('- ' + tagName.toUpperCase() + ' - tag clicked.')
-      if (this.activeTagName !== tagName){
+      if (this.activeTagName !== tagName) {
         this.SET_ACTIVE_TAG_NAME(tagName)
-        // switch (tagName) {
-        //   case 'message': {
-        //     break
-        //   }
-        //   case 'favors': {
-        //     break
-        //   }
-        //   case 'comments': {
-        //     break
-        //   }
-        //   case 'settings': {
-        //     break
-        //   }
-        //   case 'service': {
-        //
-        //     break
-        //   }
-        //   default: {
-        //     console.log('toggleTag()错误参数，组件：' + this.name)
-        //   }
-        // }
         this.$router.push('/mine/' + tagName)
         return
       }
@@ -111,22 +92,24 @@ export default {
 
 <style scoped>
 .mine-page {
+  position: absolute;
   width: 100%;
+  height: calc(100% - 60px);
+  /*border-bottom: solid 122px red;*/
 }
 
 .mine-left-bar {
-  float: right;
-  position: fixed;
+  float: left;
+  /*position: absolute;*/
   width: 10%;
   min-width: 150px;
   height: 100%;
   background-color: rgba(255, 255, 255, 0.7);
   z-index: -300;
   user-select: none;
-  border: solid 1px #BBAB95;
-  right: 70%;
-  /*margin: 0 0 0 20%;*/
-  padding-top: 50px;
+  border-right: solid 1px #BBAB95;
+  border-left: solid 1px #BBAB95;
+  margin-left: 20%;
 }
 
 .mine-center-left-tag {
@@ -163,17 +146,17 @@ export default {
 }
 
 .zk-tag-text {
-  font-size: 20px;
+  font-size: 18px;
   line-height: 36px;
 }
 
 .mine-right-container {
   float: left;
-  position: fixed;
-  /*right: 0;*/
+  border-right: solid 1px #BBAB95;
+  border-left: solid 1px #BBAB95;
   width: 48%;
   height: 100%;
-  left: 32%;
+  margin-left: 2%;
   background-color: rgba(255, 255, 255, 0.7);
   z-index: -100;
 

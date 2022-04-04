@@ -12,9 +12,11 @@ import store from '@/store/index'
 // axios
 import axios from "@/axios/index";
 Vue.prototype.$axios = axios
-
+// 工具类
 import utils from '@/utils/index'
 Vue.use(utils)
+// 图标库
+import './assets/icons/font_3295110_xeip6z1vmv/iconfont.css'
 
 Vue.config.productionTip = false
 

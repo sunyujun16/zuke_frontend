@@ -12,24 +12,10 @@
     </div>
     <div style="clear: left"></div>
     <div class="zk-comment-list">
-      <!--      {{ this.$util.timeUtil.parseToDate(2908000000000) }}-->
-      <div class="zk-comment-item" v-for="comment in commentList" :key="comment.id">
-        <img :src="comment.avatarSrc" alt="avatar" title="avatar" class="zk-avatar-s">
-        <div class="zk-comment-comment">
-          <div class="zk-comment-content">
-            <span class="comment-name">{{ comment.username }}</span><br>
-            <span class="comment-content">{{ comment.content }}</span><br>
-            <div class="comment-time">
-              {{ parseToDate(comment.time) }}
-              <span ></span>
-              点赞 1 、点踩 3、回复        举报
-            </div>
-          </div>
-          <div class="zk-comment-reply"></div>
-        </div>
+      <!--      一条评论开始-->
+      <Comment  v-for="comment in commentList" :key="comment.id" :comment="comment"/>
 
-
-      </div>
+      <!--      一条评论结束-->
 
     </div>
 
@@ -39,9 +25,11 @@
 
 <script>
 import {mapMutations} from "vuex";
+import Comment from "@/views/details/Comment";
 
 export default {
   name: "Comments",
+  components: {Comment},
   data() {
     return {
       orderType: 'heatOrder',
@@ -54,8 +42,7 @@ export default {
           id: '007',
           communityName: '五常大道127号豪宅', // 不需要，可以直接从store获取
           content: '小区太烂了, 按理说快点解封哈里斯开局多好烦啦开始就接口拉斯肯德基返回了啊可接受的阿斯顿发送到交流交流看你两节' +
-              '课类库近两年噢你好看了网络葵花 哦UI环球网IE丶啦u掠往哪里科技趣闻呢卡拉奇问啊里盛开的解放后萨达爱斯达克发上来的即发生的',
-          avatarSrc: require('@/assets/img/avatars/th1.jpeg'),
+              '课类 哦UI环球网IE丶啦u掠往哪里科技趣闻呢卡拉奇问啊里盛开的解放后萨达爱斯达克发上来的即发生的',
           username: '王八犊子',
           likes: 5210,
           time: 1648723738673,
@@ -63,14 +50,59 @@ export default {
             {
               sender: '二狗',
               receiver: '二丫',
-              content: '丫儿说得对',
-              time: 1602000000000,
+              content: '丫说得对',
+              time: 1962000000000,
+            },
+            {
+              sender: '二丫',
+              receiver: '二狗',
+              content: '狗说得也对',
+              time: 1983000000000,
+            }
+          ],
+
+        },
+        {
+          id: '008',
+          communityName: '刎颈花园', // 不需要，可以直接从store获取
+          content: '啪啪啪',
+          username: '天王老子',
+          likes: 5120,
+          unlikes: 438,
+          time: 1648453738673,
+          replies: [
+            {
+              sender: '狗',
+              receiver: '丫',
+              content: '丫。。。',
+              likes: 1520,
+              unlikes: 18,
+              time: 1962800000000,
+            },
+            {
+              sender: '丫',
+              receiver: '狗',
+              content: '狗。。。',
+              likes: 521,
+              unlikes: 28,
+              time: 1983008800000,
             }
           ],
 
         }
-      ]
+      ],
+      liked: true,
+      unliked: false,
+      replyFocused: true,
     }
+  },
+  computed: {
+    // 从服务器查询，可是如果这样的话，加载评论列表需要太多次请求了，应该加载详细评分时，设置一个短暂的setTimeOut,一次性请求出来，
+    // 然后放到store里面。嗯，没错,不过万一不成功，岂不是数据不准确了？可以设置一个flag，用来提醒组件：点赞数据是否已经加载完毕。
+    // liked() {
+    //   return true
+    // },
+
   },
   watch: {
     orderType() {
@@ -78,31 +110,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('detailsStore',['SET_ACTIVE_COMMENT_TAG_NAME']),
-    parseToDate(timeStamp) {
-      let timeDiff = -timeStamp + Date.now();
-      // console.log(timeDiff, Date.now())
-      if (timeDiff <= 60000) {
-        // 一分钟
-        return Math.floor(timeDiff / 1000) + '秒前'
-      } else if (timeDiff <= 3600000) {
-        // 1小时内
-        return Math.floor(timeDiff / 60000) + '分钟前'
-      } else if (timeDiff <= 36000000) {
-        // 十小时以内
-        return Math.floor(timeDiff / 3600000) + '小时前'
-      }
-
-      // console.log(timeStamp)
-      let date = this.$util.timeUtil.parseToDate(timeStamp);
-      let now = this.$util.timeUtil.parseToDate(Date.now());
-
-      let dateDay = date.split(' ')[0];
-      let today = now.split(' ')[0];
-      if (dateDay === today)
-        date = '今天 ' + date.split(' ')[1]
-      return date
-    },
+    ...mapMutations('detailsStore', ['SET_ACTIVE_COMMENT_TAG_NAME']),
 
   },
   activated() {
@@ -125,41 +133,6 @@ export default {
   margin-bottom: 24px;
 }
 
-.zk-avatar-s {
-  float: left;
-  height: 40px;
-  width: 40px;
-  object-fit: cover;
-  border: dotted 2px moccasin;
-  border-radius: 40px;
-}
-
-.zk-comment-comment {
-  float: left;
-  width: 92%;
-  margin-left: 10px;
-  border: dotted 2px gray;
-}
-
-.comment-name {
-  display: inline-block;
-  font-size: 14px;
-  color: rgba(159, 143, 124, 0.9);
-  margin-bottom: 2px;
-}
-
-.comment-content {
-  display: inline-block;
-  font-weight: normal;
-  font-size: 16px;
-  line-height: 24px;
-  margin-bottom: 4px;
-}
-
-.comment-time {
-  font-size: 12px;
-  color: grey;
-}
 
 
 </style>
