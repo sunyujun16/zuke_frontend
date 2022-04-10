@@ -103,7 +103,7 @@ export default {
   top: 0;
   left: 0;
   box-shadow: 0 3px 3px rgba(100, 100, 100, 0.3);
-  z-index: 4000;
+  z-index: 1000;
 }
 
 .zuke-header-position {

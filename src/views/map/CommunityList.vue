@@ -3,8 +3,8 @@
     <transition name="community-show" appear>
       <div class="community-list" v-show="showList">
         <CommunityInfoCard v-for="community in community_list" :community="community" :key="community.id"/>
+        <div style="margin: 0 0 20px 0; color: var(--grey7)">正在加载...</div>
       </div>
-
     </transition>
 
     <input id="toggle-list-button" type="button" :class="buttonClass" value="&lt;" @click="toggleList">
@@ -59,17 +59,20 @@ export default {
 </script>
 
 <style scoped>
+.community-container{
+
+}
+
 .community-list {
-  /*float: left;*/
-  position: fixed;
+  position: absolute;
   width: 520px;
   min-width: 300px;
-  height: 85%;
+  height: calc(100% - 60px);
   background-color: rgba(245, 245, 245, 0.8);
   z-index: -100;
-  padding-top: 6px;
-  padding-bottom: 100px;
-  overflow: scroll;
+  /*padding-top: 6px;*/
+  /*padding-bottom: 100px;*/
+  overflow: auto;
   box-shadow: 1px 0 3px rgba(100, 100, 100, 0.4);
 }
 
@@ -99,7 +102,7 @@ export default {
 
 /* button相关样式 注意transition属性的时间和list整体(下面的transform样式)要配合好*/
 .zuke-community-side-button-r {
-  position: fixed;
+  position: absolute;
   left: 520px;
   top: 46%;
   height: 100px;

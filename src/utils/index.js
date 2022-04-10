@@ -1,8 +1,10 @@
 import styleFunc from '@/utils/raw_style_func.js'
 import timeUtil from "@/utils/timeUtils";
+import stringUtils from "@/utils/stringUtils";
 
 const util = {
-    timeUtil
+    timeUtil,
+    stringUtils
 }
 
 export default {

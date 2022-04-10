@@ -49,8 +49,18 @@ export default {
   data(){
     return {
       community: {
-        id: '',
-        name: '五常大道127号小区',
+        // 这是高德API返回的完整数据
+        id :  "B0FFFA82R7",
+        name :  "五常大道127号小区",
+        type :  "商务住宅;住宅区;住宅小区",
+        location : {
+          lng :  120.043033,
+          lat :  30.245526
+        },
+        address :  "五常大道127",
+        tel :  "",
+        distance :  NaN,
+        shopinfo :  "0"
       },
       stared: true,
       detailLink: ''
@@ -85,10 +95,9 @@ export default {
 
 <style scoped>
 .zuke-community-item {
-  margin-top: 20px;
+  margin: 10px 0 10px 5%;
   height: 150px;
   width: 90%;
-  margin-left: 5%;
   background-color: #FFFFFF;
   border: solid 1px #BBAB95;
   border-radius: 4px;

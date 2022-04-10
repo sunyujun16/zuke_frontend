@@ -48,4 +48,17 @@ export default {
 .el-message {
   opacity: 0.91;
 }
+
+:root {
+  --blue: #1e90ff;
+  --white: #ffffff;
+  --grey7: #555555;
+  --grey5: #999999;
+  --grey3: #bbbbbb;
+  --tea: #BBAB95;
+  --deep-tea: #9f8f7c;
+  --zk-blue: rgb(68,84,106);
+
+}
+
 </style>
