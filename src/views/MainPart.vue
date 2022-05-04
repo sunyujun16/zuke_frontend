@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div style="min-width: 998px;">
 <!--    <img src="../assets/img/background/samantha-gades-BlIhVfXbi9s-unsplash-s.jpg" alt="nah" class="background-img" id="fuck">-->
 <!--    <img src="../assets/img/background/samantha-gades-BlIhVfXbi9s-unsplash-s.jpg" alt="nah" class="background-img" id="fuck">-->
 <!--    <img src="../assets/img/background/joris-beugels-9Af1xSn7Jkw-unsplash-s.jpg" alt="nah" class="background-img">-->

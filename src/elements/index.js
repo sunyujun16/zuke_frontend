@@ -2,7 +2,8 @@ import '../assets/css/element_ui.css'
 
 import {
     Row, Col, Container, Main, Header, Footer, Button, Aside, Divider, Link, Message, Drawer, RadioGroup, Radio,
-    Dialog, Form, FormItem, Input, Select, Option, MessageBox, Carousel, CarouselItem
+    Dialog, Form, FormItem, Input, Select, Option, MessageBox, Carousel, CarouselItem, Menu, MenuItem, Submenu,
+    Cascader
 } from "element-ui";
 
 export default {
@@ -28,6 +29,11 @@ export default {
         Vue.use(Option);
         Vue.use(Carousel);
         Vue.use(CarouselItem);
+        Vue.use(Menu);
+        Vue.use(MenuItem);
+        Vue.use(Submenu);
+        Vue.use(Cascader);
+
 
         // 引入无需关闭的弹窗提醒，需要手动添加一个$message属性。
         // Vue.use(Message) // 这行会导致页面加载时直接弹出一个空白窗口，只好替换为component方式。

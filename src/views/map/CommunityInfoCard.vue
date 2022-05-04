@@ -78,7 +78,7 @@ export default {
       console.log('调用showDetail')
       // push, 由于要打开新页面，所以不能用push，直接访问路由地址
       let target = this.$refs.detailALink
-      this.detailLink = this.$store.state.constsStore.serverHostName + '/detail'
+      this.detailLink = this.$store.state.constsStore.frontEndHost + '/detail'
       console.log(this.detailLink)
       // target.setAttribute('href', window.location.origin + '/map_list')
       // 注意，上面的赋值对这里的target跳转并没有发生影响，因为函数执行过程中无法实时渲染DOM元素，所以...nextTick()，啊我真jb聪明，艹。

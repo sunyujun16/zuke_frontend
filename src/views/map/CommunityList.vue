@@ -15,6 +15,7 @@
 
 <script>
 import CommunityInfoCard from "@/views/map/CommunityInfoCard";
+import {mapMutations} from "vuex";
 
 export default {
   name: "CommunityList",
@@ -23,7 +24,7 @@ export default {
     return {
       showList: true,
       buttonClass: 'zuke-community-side-button-r',
-      community_list: [0,1,2,3,4,5,6,7,8,9], // 占位用，待连接数据库
+      community_list: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9], // 占位用，待连接数据库
     }
   },
   beforeMount() {
@@ -33,6 +34,7 @@ export default {
 
   },
   methods: {
+    ...mapMutations('mapStore', ['ON_COM_SHOW', 'ON_COM_HIDE']),
     toggleList() {
       this.showList = !this.showList
       // 改变button的文字
@@ -40,12 +42,14 @@ export default {
       switch (this.showList) {
         case false:
           this.buttonClass = 'zuke-community-side-button-l';
+          this.ON_COM_HIDE()
           setTimeout(() => {
             element.value = '>';
           }, 300)
           break;
         case true:
           this.buttonClass = 'zuke-community-side-button-r';
+          this.ON_COM_SHOW()
           setTimeout(() => {
             element.value = '<';
           }, 300)
@@ -59,7 +63,7 @@ export default {
 </script>
 
 <style scoped>
-.community-container{
+.community-container {
 
 }
 
@@ -109,6 +113,7 @@ export default {
   opacity: 0.8;
   color: #9f8f7c;
   font-weight: bold;
+  /*background-color: var(--tea-op3);*/
   border: solid 1px rgba(2, 2, 2, 0.1);
   transition: 0.5s ease
 }
@@ -125,7 +130,8 @@ export default {
   height: 100px;
   opacity: 0.8;
   font-weight: bold;
-  color: #9f8f7c;
+  color: var(--white);
+  background-color: var(--tea-op9);
   border: solid 1px rgba(2, 2, 2, 0.1);
   transition: 0.5s ease;
 }
@@ -150,7 +156,6 @@ export default {
 .community-show-enter-to, .community-show-leave {
   transform: translateX(0);
 }
-
 
 
 </style>

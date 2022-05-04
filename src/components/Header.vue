@@ -6,16 +6,15 @@
       <!--  icon + position-->
       <img id="position_icon" alt="position-icon" src="../assets/img/header/position.png">
       <div class="tag_position">
-        <span class="text-position" style="float: left">beijing</span>
+        <span class="text-position" style="float: left">{{ currentCity }}</span>
       </div>
 
-
       <!--  icon + search-->
-      <!--    <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch(searchValue)">-->
-      <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">
+      <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="doSearch()">
+      <!--      <img id="search_ico" alt="search-icon" src="../assets/img/header/search.png" @click="tempTest">-->
       <a ref="fucka" :href="fuck" style="float: left" target="_blank" v-show="false"></a>
       <label for="search_input">
-        <input id="search_input" type="text" placeholder="请输入要搜索的关键词" v-model="searchValue">
+        <input id="search_input" type="text" :placeholder="placeholder" v-model="searchValue" @keyup.enter="doSearch()">
       </label>
 
       <!--  main button
@@ -30,37 +29,50 @@
         <span class="header-text">个人中心</span>
       </div>
 
-      <!--  map search button-->
-
-      <!--  personal center button-->
-
       <!--  avatar button + downside_bar-->
-      <img id="avatar_ico" alt="avatar-icon" src="../assets/img/header/avatar.png">
+      <Avatar :toggle-log-reg-box="toggleLogRegBox"></Avatar>
+      <!--      <i id="avatar_ico_i" class="zuke-icon-user"></i>-->
 
       <div style="clear: both"></div>
     </div>
+    <!-- 占位用, 把Header本该占用的60px文档流高度给占用掉, 否则其它主界面会从top:0开始 -->
     <div class="zuke-header-position"></div>
+
+    <!-- 注册登录组件 -->
+    <LoginRegister :toggleCallBack="toggleLogRegBox"></LoginRegister>
+
   </div>
 
 </template>
 
 <script>
 import {mapMutations, mapState} from "vuex";
+import AMapLoader from "@amap/amap-jsapi-loader";
+import LoginRegister from "@/components/LoginRegister";
+import Avatar from "@/components/Avatar";
+
+// 这里加载地图服务是为了, 使用定位和输入提示, 而不绑定任何元素, 此处先设置明文密钥, 生产环境再变更.
+window._AMapSecurityConfig = {
+  securityJsCode: 'c801d1e37aa760f6eeaefd6fad0c43ed',
+}
 
 export default {
   name: "Header",
+  components: {Avatar, LoginRegister},
   data() {
     return {
       searchValue: '',
       fuck: 'http://localhost:8080/#/map_list',
+      currentCity: '河兰NewYork',
+      placeholder: '请输入要搜索的关键词',
     }
   },
   computed: {
-    ...mapState('headerStore', ['isActiveMain', 'isActiveMap', 'isActiveMine']),
-
+    ...mapState('headerStore', ['isActiveMain', 'isActiveMap', 'isActiveMine', 'loginRegOpen']),
   },
   methods: {
-    ...mapMutations('headerStore', ['SET_MAIN', 'SET_MAP', 'SET_MINE']),
+    ...mapMutations('headerStore', ['SET_MAIN', 'SET_MAP', 'SET_MINE', 'OPEN_LOG_REG', 'CLOSE_LOG_REG']),
+    ...mapMutations('mapStore', ['CHANGE_SEARCH_VALUE']),
     pushToMainList() {
       if (!this.isActiveMain) {
         this.$router.push('/');
@@ -76,163 +88,86 @@ export default {
         this.$router.push('/mine');
       }
     },
-    doSearch(e, searchValue) {
+    doSearch() {
+      if (!this.searchValue) {
+        this.$message({
+          message: '输入不能为空',
+          type: "warning",
+          duration: 1000
+        })
+        return
+      }
       // 其实没必要传参, 直接通过this获取即可, 此处纯属娱乐。
-      // 新建页面，导航到detail页面，带1个参数--小区id，detail页面beforeMount之时，axios或jQuery向后端请求小区信息，不要keep-alive(暂定)
+      // 先判断此时是否在地图组件页面, 如果不是, push过去,
+      if (!this.isActiveMap)
+        this.$router.push('/map_list')
 
+      // 修改searchValue, 触发watch即可, next是避免Map未加载完毕, watch不触发.
+      this.$nextTick(() => {
+        // console.log(this) // 是VM, 有空得研究研究这个this.
+        console.log("即将修改searchValue...")
+        this.CHANGE_SEARCH_VALUE(this.searchValue)
+      })
 
     },
     tempTest() {
       let target = this.$refs.fucka
-      this.fuck = this.$store.state.constsStore.serverHostName + '/map_list'
+      this.fuck = this.$store.state.constsStore.frontEndHost + '/map_list'
       // target.setAttribute('href', window.location.origin + '/map_list')
       target.click()
+    },
+    initMap() {
+      let _this = this;
+      AMapLoader.load({
+            key: "1651ad391fda68d74c988ea812bf3a04",     // 申请好的Web端开发者Key，首次调用 load 时必填
+            version: "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
+            plugins: [],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
+          }
+      ).then((AMap) => {
+            // _this.aMap = AMap
+            AMap.plugin([
+              'AMap.AutoComplete',
+              'AMap.CitySearch',
+            ], function () {
+              /* AutoComplete部分 */
+              // input 为绑定输入提示功能的input的DOM ID
+              let autoOptions = {
+                input: 'search_input'
+              }
+              // 无需再手动执行search方法，autoComplete会根据传入input对应的DOM动态触发search
+              let autoComplete = new AMap.AutoComplete(autoOptions);
+
+              /* CitySearch部分 */
+              let citySearch = new AMap.CitySearch();
+              citySearch.getLocalCity(function (status, result) {
+                if (status === 'complete' && result.info === 'OK') {
+                  // 查询成功，result即为当前所在城市信息
+                  _this.currentCity = result.city
+                }
+              })
+
+
+            });
+          }
+      ).catch(e => {
+            console.log(e);
+          }
+      )
+    },
+    toggleLogRegBox() {
+      // console.log("切换登录容器 ", this.loginRegOpen)
+      if (this.loginRegOpen)
+        this.CLOSE_LOG_REG()
+      else
+        this.OPEN_LOG_REG()
     }
+  },
+  mounted() {
+    this.initMap()
   }
 }
 </script>
 
 <style scoped>
-.zuke-header {
-  /*min-width: 998px;*/
-  /*opacity: 0.95;*/
-  position: absolute;
-  width: 100%;
-  background-color: rgba(187, 171, 149, 1);
-  height: 60px;
-  top: 0;
-  left: 0;
-  box-shadow: 0 3px 3px rgba(100, 100, 100, 0.3);
-  z-index: 1000;
-}
-
-.zuke-header-position {
-  width: 100%;
-  background-color: rgba(187, 171, 149, 0);
-  height: 60px;
-  top: 0;
-  left: 0;
-  z-index: 0;
-}
-
-#zuke_logo {
-  float: left;
-  height: 120%;
-  margin-left: 5%;
-  margin-top: 0;
-}
-
-#position_icon {
-  float: left;
-  height: 30%;
-  margin-left: 5%;
-  margin-top: 1.1%;
-  margin-right: -1.4%;
-  z-index: 500;
-}
-
-.tag_position {
-  margin-left: 0.3%;
-  width: 5%;
-  float: left;
-  height: 100%;
-  font-size: 14px;
-  text-align: left;
-}
-
-.text-position {
-  float: left;
-  width: 100px;
-  margin-top: 22%;
-  margin-left: 30%;
-  color: white;
-  font-size: 15px;
-}
-
-#search_ico {
-  padding: 8px;
-  float: left;
-  height: 30%;
-  margin-left: 12%;
-  margin-top: 0.85%;
-  margin-right: -0.2%;
-  border-radius: 5px;
-}
-
-#search_ico:hover {
-  margin-right: -0.3%;
-  height: 33%;
-  /*box-shadow: 2px 2px 2px black;*/
-}
-
-#search_ico:active {
-
-  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.3), inset -1px -1px 1px rgba(159, 143, 124, 0.8);
-}
-
-#search_input {
-  width: 15%;
-  float: left;
-  background-color: rgba(255, 255, 255, 0.8);
-  border-radius: 6px;
-  line-height: 18px;
-  margin: 0.9% 8% 0 0.6%;
-  padding: 4px 7px;
-  border-color: rgba(187, 171, 149, 0.6);
-}
-
-#search_input:focus {
-  outline: none;
-  border-color: rgba(159, 143, 124, 0.8);
-}
-
-.tag_default {
-  margin-left: 1%;
-  width: 5%;
-  float: left;
-  height: 100%;
-  /*background-color: red;*/
-}
-
-.tag_active {
-  background-color: rgba(159, 143, 124, 0.6);
-}
-
-.header-text {
-  float: left;
-  width: 100%;
-  height: 100%;
-  line-height: 400%;
-  color: white;
-  font-size: 15px;
-  text-align: center;
-  /*margin-top: 20%;*/
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
-  user-select: none;
-  transition: all 0.1s;
-  /*#9f8f7c*/
-  white-space: nowrap;
-}
-
-.header-text:hover {
-  /*font-weight: bold;*/
-  cursor: default;
-  background-color: rgba(159, 143, 124, 0.4);
-  transition: all 0.1s;
-}
-
-.header-text:active {
-  /*font-weight: bold;*/
-  cursor: default;
-  background-color: rgba(159, 143, 124, 0.6);
-  transition: all 0.1s;
-}
-
-#avatar_ico {
-  float: right;
-  height: 60%;
-  margin-right: 5%;
-  margin-top: 0.6%;
-}
-
+@import "../assets/css/components/header.css";
 </style>

@@ -7,30 +7,63 @@
 
     <!--    </div>-->
     <div id="zk-map-container"></div>
-    <button style="position: absolute; top: 300px; left:300px" @click="moveMap">点击移动map</button>
+    <!--    <button style="position: absolute; top: 300px; left:300px" @click="moveMap">点击移动map</button>-->
+    <CitySelector :map="map" :a-map="aMap"></CitySelector>
+
+    <button style="position: absolute; top: 300px; left:480px" @click="searchTest">点击打印搜索数据</button>
 
   </div>
 </template>
 
 <script>
-import {mapMutations} from "vuex";
+import {mapMutations, mapState} from "vuex";
 import AMapLoader from "@amap/amap-jsapi-loader"
+import CitySelector from "@/views/map/CitySelector";
+
+window._AMapSecurityConfig = {
+  securityJsCode: 'c801d1e37aa760f6eeaefd6fad0c43ed',
+}
 
 export default {
   name: "MapPage",
+  components: {CitySelector},
   data() {
     return {
       map: null,
       aMap: null,
+      mapTools: {
+        placeSearch: null,
+      }
+
+    }
+  },
+  computed: {
+    ...mapState('mapStore', ['currentSearchValue', 'currentLngLat']),
+
+  },
+  watch: {
+    currentSearchValue(){
+      let searchValue = this.currentSearchValue
+      // 还原searchValue
+      this.CHANGE_SEARCH_VALUE('')
+
+      // this.$message.info("监听成功") // OK
+      /*
+      todo 下面利用searchValue要做的几件事(代码会很长, 注意重构):
+       1 在数据库和高德中获取结果集, 2 将结果集注入小区组件中. 3 地图上根据结果集生成marker点
+       要求: 1 限制在所选城市范围内搜索, 2 点击marker与列表互动, 样式变化,
+       */
+
 
     }
   },
   methods: {
     ...mapMutations('headerStore', ['SET_MAIN', 'SET_MAP', 'SET_MINE']),
+    ...mapMutations('mapStore', ['CHANGE_SEARCH_VALUE']),
     initMap() {
       let _this = this;
       AMapLoader.load({
-            key: "1651ad391fda68d74c988ea812bf3a04",              // 申请好的Web端开发者Key，首次调用 load 时必填
+            key: "1651ad391fda68d74c988ea812bf3a04",     // 申请好的Web端开发者Key，首次调用 load 时必填
             version: "2.0",   // 指定要加载的 JSAPI 的版本，缺省时默认为 1.4.15
             plugins: [],           // 需要使用的的插件列表，如比例尺'AMap.Scale'等
           }
@@ -38,6 +71,7 @@ export default {
             let map = new AMap.Map('zk-map-container', {
                   zoom: 12,
                   // center: [116.397428, 39.90933]
+                  center: ''
                 }
             );
             _this.map = map
@@ -51,10 +85,11 @@ export default {
               'AMap.Geolocation', // 定位控件 // 以上为地图基础控件
               'AMap.ElasticMarker',
               'AMap.AutoComplete',
-              'AMap.PlaceSearch',
+              'AMap.PlaceSearch', // 地点搜索插件
               'AMap.StationSearch',
               'AMap.Geocoder',
               'AMap.CitySearch',
+              'AMap.Weather',
             ], function () {
               //异步同时加载多个插件
               let n = 1;
@@ -93,7 +128,9 @@ export default {
                   } else {
                     console.log(result)
                     if (result.status === 1)
-                    _this.$message.info('获取浏览器定位超时')
+                      _this.$message.info({
+                        message: '获取定位超时()'
+                      })
                   }
                 });
 
@@ -178,7 +215,7 @@ export default {
         position: [116.405567, 39.910651],
         title: 'fucker'
       });
-// 构造矢量圆形
+      // 构造矢量圆形
       let circle = new AMap.Circle({
         center: new AMap.LngLat("116.403322", "39.920255"), // 圆心位置
         radius: 1000,  //半径
@@ -195,17 +232,28 @@ export default {
       // add方法可以传入一个覆盖物数组，将点标记和矢量圆同时添加到地图上
       this.map.add([marker, circle]);
     },
-    moveMap() {
+    moveMap(e, lngLat) {
       // this.map.setCenter([116.392309, 39.900466], false)
 
       this.$message({
         message: 'moving',
         type: 'info',
         offset: 60,
-        // duration: 500
+        // duration: 200
 
       })
       // this.map
+    },
+    searchTest() {
+      let AMap = this.aMap;
+      let placeSearch = new AMap.PlaceSearch({
+        city: '杭州'
+      })
+      let keywords = '小区'
+      placeSearch.setPageIndex(8)
+      placeSearch.search(keywords, function (status, result) {
+        console.log(status, ' ===> ', result)
+      })
     }
   },
   activated() {
@@ -246,7 +294,8 @@ export default {
 #zuke-map-page {
   position: absolute;
   width: 100%;
-  height: calc(100% - 60px - 24px);
+  min-width: 998px;
+  height: calc(100% - 60px);
   /*background-color: red;*/
   background-color: rgba(245, 245, 245, 0.6);
   z-index: -200;
