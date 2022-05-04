@@ -52,6 +52,7 @@ export default {
 :root {
   --blue: #1e90ff;
   --white: #ffffff;
+  --grey9: #333333;
   --grey7: #555555;
   --grey5: #999999;
   --grey3: #bbbbbb;

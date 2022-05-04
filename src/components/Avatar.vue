@@ -11,7 +11,7 @@
       <div class="zk-avatar-dropdown" v-show="showMenu">
         <div class="dropdown-head">
           <!--          <div style="height: 1px; background-color: transparent"></div>-->
-          <span style="font-weight: bold; color: black; font-size: 14px">{{ this.currentUser.username }}</span>
+          <span style="font-weight: bold; color: var(--grey9); font-size: 14px">{{ this.currentUser.username }}</span>
           <span>超级管理员</span>
           <span>ID: 001</span>
         </div>
@@ -65,11 +65,24 @@ export default {
       this.avatarTitle = null
     },
     logOut() {
-      // 发请求咯
-      this.$axios.get(
+      let _this = this
+      // todo 发请求搞定, 后续规定动作待完善
+      let url = _this.$store.state.constsStore.backEndHost + '/logout'
+      _this.$axios.get(url).then(
+          response => {
+            let data = response.data;
+            if (data === 'success')
+              _this.$message.success("服务端已清理")
+            else if (data === 'fail')
+              _this.$message.error("服务端清理失败")
+            else
+              _this.$message.error("服务端未知错误")
+          },
+          error => {
+            _this.$message.error("服务器端退出异常")
+          })
 
-
-      )
+      // 规定动作: 清理sessionStorage, 修改state登录状态, current信息等修改
 
       let defaultUser = {
         id: '007',
@@ -96,7 +109,7 @@ export default {
   height: 60%;
   margin-right: 5%;
   margin-top: 0.88%;
-  opacity: 0.88;
+  opacity: 0.94;
   user-select: none;
 }
 
@@ -115,7 +128,7 @@ export default {
 
 /* 进入的起点、离开的终点 */
 .avt-dropdown-enter, .avt-dropdown-leave-to {
-  transform: translateY(5%) translateX(-5%);
+  transform: translateY(3%) translateX(-3%);
   opacity: 0;
 }
 
@@ -126,7 +139,7 @@ export default {
 
 /* 进入的终点、离开的起点 */
 .avt-dropdown-enter-to, .avt-dropdown-leave {
-  transform: translateX(0);
+  /*transform: translateX(0);*/
 }
 
 .dropdown-head {
@@ -158,6 +171,9 @@ export default {
 
 .dropdown-body span:hover {
   background-color: var(--grey5);
+}
+.dropdown-body span:active {
+  background-color: var(--grey9);
 }
 
 
