@@ -56,7 +56,8 @@ export default {
   components: {},
   data() {
     return {
-      tagNames: ['']
+      tagNames: [''],
+      lastTag: 'message',
     }
   },
   computed: {
@@ -67,23 +68,41 @@ export default {
     ...mapMutations('detailsStore', ['SET_ACTIVE_TAG_NAME']),
     toggleTag(tagName) {
       // 其实没必要放store里面，因为只有本组件在用这些tagName。唔...是个经验。
-      console.log('- ' + tagName.toUpperCase() + ' - tag clicked.')
+      // console.log('- ' + tagName.toUpperCase() + ' - tag clicked.')
       if (this.activeTagName !== tagName) {
         this.SET_ACTIVE_TAG_NAME(tagName)
         this.$router.push('/mine/' + tagName)
         return
       }
+
       console.log('redundant click, do fucking nothing.')
     },
+    restoreLast() {
+      // 到上一次的标签,
+      console.log("mine_activated", "active:", this.activeTagName, " -- last:", this.lastTag)
+      if (this.activeTagName !== this.lastTag) {
+        console.log("切 -- ")
+        this.toggleTag(this.lastTag)
+      }
+    }
   },
   beforeMount() {
 
+  },
+  watch: {
   },
   activated() {
     this.SET_MAIN(false);
     this.SET_MAP(false);
     this.SET_MINE(true);
+    // 这个函数正确运行的前提是: 子组件和父组件的激活顺序是固定的从子到父. 不去求证了, 想当然一下吧.
+    this.restoreLast()
   },
+  deactivated() {
+    console.log("mine_deactivated")
+    this.lastTag = this.activeTagName
+  },
+
   // beforeRouteEnter(from, to, next) {
   //   next()
   // },
@@ -104,7 +123,7 @@ export default {
   width: 10%;
   min-width: 150px;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.88);
   z-index: -300;
   user-select: none;
   border-right: solid 1px #BBAB95;
@@ -157,7 +176,7 @@ export default {
   width: 48%;
   height: 100%;
   margin-left: 2%;
-  background-color: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.88);
   z-index: -100;
 
 }

@@ -6,13 +6,15 @@
          :src="avatarSrc"
          @click="toggleLR"
     >
+<!--    <span v-show="!onLine" style="margin-left: 10px; font-size: 12px; color: white; display: inline-block;-->
+<!--     height: 60px">登录/注册</span>-->
 
     <transition name="avt-dropdown">
       <div class="zk-avatar-dropdown" v-show="showMenu">
         <div class="dropdown-head">
           <!--          <div style="height: 1px; background-color: transparent"></div>-->
           <span style="font-weight: bold; color: var(--grey9); font-size: 14px">{{ this.currentUser.username }}</span>
-          <span>超级管理员</span>
+          <span>{{ this.userType }}</span>
           <span>ID: 001</span>
         </div>
         <!--        {{this.currentUser.username}}-->
@@ -41,12 +43,26 @@ export default {
     return {
       showMenu: false,
       avatarSrc: require('../assets/img/header/avatar.png'),
-      avatarTitle: '登录/注册'
+      avatarTitle: '登录/注册',
 
     }
   },
   computed: {
-    ...mapState("userStore", ['onLine', 'currentUser'])
+    ...mapState("userStore", ['onLine','defaultUser', 'currentUser']),
+    userType(){
+      switch (this.currentUser.userType){
+        case "0":
+          return "上帝(管理员)"
+        case "1":
+          return "贵族(VIP)"
+        case "2":
+          return "草民"
+        case "3":
+          return "匪徒"
+        default:
+          return "啥也不是"
+      }
+    }
 
   },
   methods: {
@@ -62,13 +78,14 @@ export default {
       // }
 
       this.showMenu = true
-      this.avatarTitle = null
+      // this.avatarTitle = null
     },
     logOut() {
+      if (!this.onLine) return
       let _this = this
-      // todo 发请求搞定, 后续规定动作待完善
+      // 发请求
       let url = _this.$store.state.constsStore.backEndHost + '/logout'
-      _this.$axios.get(url).then(
+      this.$axios.get(url).then(
           response => {
             let data = response.data;
             if (data === 'success')
@@ -79,24 +96,16 @@ export default {
               _this.$message.error("服务端未知错误")
           },
           error => {
-            _this.$message.error("服务器端退出异常")
+            _this.$message.error("服务器端退出异常" + error.response.data)
           })
 
-      // 规定动作: 清理sessionStorage, 修改state登录状态, current信息等修改
+      // 规定动作: 清理sessionStorage, 修改state登录状态, currentUser信息等修改
+      sessionStorage.removeItem("userInfo")
+      this.SET_ONLINE(false)
+      this.SET_USER(this.defaultUser)
 
-      let defaultUser = {
-        id: '007',
-        username: '齐天大剩',
-        password: '哈哈哈',
-        gender: '男',
-        userType: '0',
-        registerTime: '明天',
-        lastLoginTime: '后天',
-        userStatus: '0',
-        phoneNum: '110',
-        email: '10086@163.com',
-        blank: '',
-      }
+
+
     }
 
   }
@@ -108,7 +117,7 @@ export default {
   float: right;
   height: 60%;
   margin-right: 5%;
-  margin-top: 0.88%;
+  margin-top: 0.618%;
   opacity: 0.94;
   user-select: none;
 }

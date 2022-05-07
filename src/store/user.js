@@ -16,6 +16,19 @@ export default {
     },
     state:{
         onLine: false,
+        defaultUser: {
+            id: '007',
+            username: '齐天大剩',
+            password: '哈哈哈',
+            gender: '男',
+            userType: '0',
+            registerTime: '明天',
+            lastLoginTime: '后天',
+            userStatus: '0',
+            phoneNum: '110',
+            email: '10086@163.com',
+            blank: '',
+        },
         currentUser: {
             id: '007',
             username: '齐天大剩',
@@ -29,6 +42,11 @@ export default {
             email: '10086@163.com',
             blank: '',
         },
+        avatarDTO: {
+            userId: '',
+            avatarData: '',
+            fileName: ''
+        }
 
     },
     getters:{

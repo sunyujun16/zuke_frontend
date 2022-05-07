@@ -2,7 +2,7 @@ import MineCenter from "@/views/mine_about/MineCenter";
 import MyMessage from "@/views/mine_about/message/MyMessage";
 import MyFavors from "@/views/mine_about/MyFavors";
 import MyComments from "@/views/mine_about/MyComments";
-import MySettings from "@/views/mine_about/MySettings";
+import MySettings from "@/views/mine_about/settings/MySettings";
 import MyService from "@/views/mine_about/MyService";
 import ReplyMe from "@/views/mine_about/message/ReplyMe";
 import LikesMe from "@/views/mine_about/message/LikesMe";

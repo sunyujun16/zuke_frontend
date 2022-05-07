@@ -15,8 +15,16 @@
 </template>
 
 <script>
+import {mapMutations, mapState} from "vuex";
+
 export default {
-  name: "MyMessage"
+  name: "MyMessage",
+  methods: {
+    ...mapMutations('detailsStore', ['SET_ACTIVE_TAG_NAME']),
+  },
+  activated() {
+    this.SET_ACTIVE_TAG_NAME('message')
+  }
 }
 </script>
 

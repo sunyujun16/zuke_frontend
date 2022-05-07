@@ -1,6 +1,6 @@
 export default {
     trimByLength(content, length){
-        console.log('content: ',content,' -- length: ',length)
+        // console.log('content: ',content,' -- length: ',length)
         if (!length) length = 10
         if (typeof length !== "number") {
             try {
