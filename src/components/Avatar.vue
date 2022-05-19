@@ -35,6 +35,7 @@
 
 <script>
 import {mapMutations, mapState} from "vuex";
+import md5 from 'js-md5';
 
 export default {
   name: "Avatar",
@@ -44,20 +45,19 @@ export default {
       showMenu: false,
       avatarSrc: require('../assets/img/header/avatar.png'),
       avatarTitle: '登录/注册',
-
     }
   },
   computed: {
     ...mapState("userStore", ['onLine','defaultUser', 'currentUser']),
     userType(){
       switch (this.currentUser.userType){
-        case "0":
+        case 0:
           return "上帝(管理员)"
-        case "1":
+        case 1:
           return "贵族(VIP)"
-        case "2":
+        case 2:
           return "草民"
-        case "3":
+        case 3:
           return "匪徒"
         default:
           return "啥也不是"
@@ -65,8 +65,23 @@ export default {
     }
 
   },
+  watch: {
+    onLine(){
+      if (this.onLine){
+        console.log("Avatar: 监听到Online为true ... ")
+        this.avatarSrc =
+            "https://alifile.sunyujun.com/zuke/avatars/"
+            + md5(this.currentUser.id + this.currentUser.username) + '.jpg';
+        this.SET_AVATAR_SRC(this.avatarSrc)
+      } else {
+        this.avatarSrc = require('../assets/img/header/avatar.png')
+        this.SET_AVATAR_SRC('')
+      }
+
+    }
+  },
   methods: {
-    ...mapMutations("userStore", ['SET_ONLINE', 'SET_USER']),
+    ...mapMutations("userStore", ['SET_ONLINE', 'SET_USER', 'SET_AVATAR_SRC']),
     toggleLR() {
       if (!this.onLine)
         this.toggleLogRegBox()
@@ -100,11 +115,9 @@ export default {
           })
 
       // 规定动作: 清理sessionStorage, 修改state登录状态, currentUser信息等修改
-      sessionStorage.removeItem("userInfo")
+      localStorage.removeItem("userInfo")
       this.SET_ONLINE(false)
       this.SET_USER(this.defaultUser)
-
-
 
     }
 
@@ -137,7 +150,7 @@ export default {
 
 /* 进入的起点、离开的终点 */
 .avt-dropdown-enter, .avt-dropdown-leave-to {
-  transform: translateY(3%) translateX(-3%);
+  transform: translateY(-3%) translateX(3%);
   opacity: 0;
 }
 
@@ -148,7 +161,6 @@ export default {
 
 /* 进入的终点、离开的起点 */
 .avt-dropdown-enter-to, .avt-dropdown-leave {
-  /*transform: translateX(0);*/
 }
 
 .dropdown-head {
@@ -188,11 +200,14 @@ export default {
 
 #avatar_ico {
   height: 100%;
+  border-radius: 20px;
 }
 
 #avatar_ico:hover {
+  height: 110%;
   opacity: 1;
   cursor: pointer;
+  transition: 0.4s;
 }
 
 </style>

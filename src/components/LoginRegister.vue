@@ -145,8 +145,8 @@ export default {
         ]
       },
       loginForm: {
-        pass: '',
-        username: ''
+        pass: '0',
+        username: 'sun'
       },
       loginRules: {
         pass: [
@@ -160,7 +160,7 @@ export default {
   },
   computed: {
     ...mapState('headerStore', ['loginRegOpen']),
-    ...mapState('userStore', ['onLine', 'currentUser'])
+    ...mapState('userStore', ['onLine', 'defaultUser', 'currentUser'])
 
   },
   methods: {
@@ -207,28 +207,8 @@ export default {
           }
       ).then(response => {
         let user = response.data;
-        console.log("\n登录成功，状态码：" + response.status + '\n')
-        // 修改对应login状态的state
-        this.SET_ONLINE(true);
-        // 设置全局用户信息。
-        this.SET_USER({
-          id: user.id,
-          username: user.username,
-          password: user.password,
-          gender: user.gender,
-          userType: user.userType,
-          registerTime: user.registerTime,
-          lastLoginTime: user.lastLoginTime,
-          userStatus: user.userStatus,
-          phoneNum: user.phoneNum,
-          email: user.email,
-          blank: user.blank,
-        });
-        // 存储用户信息到sessionStorage
-        sessionStorage.setItem("userInfo", JSON.stringify(user));
-        // // 退出登录窗口
-        this.CLOSE_LOG_REG()
-        console.log("登录成功: 用户", user.username)
+        // console.log("\n登录成功，状态码：" + response.status + '\n')
+        this.onLogin(user);
         this.$message({message: "登录成功, 用户: " + user.username, type: "success", duration: 1000})
       }).catch(error => {
         this.$message({
@@ -252,7 +232,7 @@ export default {
             withCredentials: false, // 注册的时候，肯定没登录，并且不会被拦截。那么何必带cookies呢。
           }
       ).then(response => {
-       console.log("收到响应，状态码：" + response.status)
+        console.log("收到响应，状态码：" + response.status)
         // 这是登录用的，注册成功应该给个提示，然后弹出登录页
         this.$message({
           message: '注册成功，请登录',
@@ -272,7 +252,50 @@ export default {
         })
       })
     },
+    onLogin(user) {
+      // 修改对应login状态的state
+      this.SET_ONLINE(true);
+      // 设置全局用户信息。
+      this.SET_USER({
+        id: user.id,
+        username: user.username,
+        password: user.password,
+        gender: user.gender,
+        userType: user.userType,
+        registerTime: user.registerTime,
+        lastLoginTime: user.lastLoginTime,
+        userStatus: user.userStatus,
+        phoneNum: user.phoneNum,
+        email: user.email,
+        blank: user.blank,
+      });
+      // 存储用户信息到sessionStorage
+      localStorage.setItem("userObj", JSON.stringify(user));
+      // // 退出登录窗口
+      this.CLOSE_LOG_REG()
+      console.log("登录成功: 用户", user.username)
+    }
 
+  },
+  beforeMount() {
+    let _this = this;
+    let userObj = JSON.parse(localStorage.getItem('userObj'));
+    if (userObj) {
+      let url = this.$store.state.constsStore.backEndHost + "/sniff"
+      // 发送嗅探
+      this.$axios.get(url)
+          .then(res => {
+            console.log("\n通信已存在, 自动登录 ...")
+            _this.onLogin(userObj)
+          }).catch(e => {
+        // 规定动作: 清理sessionStorage, 修改state登录状态, currentUser信息等修改
+        localStorage.removeItem("userInfo")
+        this.SET_ONLINE(false)
+        this.SET_USER(this.defaultUser)
+      })
+    } else {
+      console.log("未发现本地userObj, 无操作, 正常加载页面 ...")
+    }
   }
 }
 </script>

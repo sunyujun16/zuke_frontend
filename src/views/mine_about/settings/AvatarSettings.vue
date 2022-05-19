@@ -1,5 +1,8 @@
 <template>
   <div class="avatar-upload-container">
+    <div>
+      <img :src="imgSrc" alt="avatar" style="height: 200px; margin-bottom: 10px">
+    </div>
     <el-button @click="dialogVisible = true">上传头像</el-button>
     <!--    <span style="font-size: 12px">仅支持png, jpg, jpeg, 图像大小不超过3M</span>-->
     <el-dialog
@@ -27,9 +30,11 @@
             <el-button slot="trigger" size="small" type="primary" ref="uploadBtn" class="choose-btn">
               选择图片
             </el-button>
-            <div slot="trigger" style="position: relative;">点击按钮, 或拖拽到此区域上传</div>
+            <!--            <div slot="trigger" style="position: relative;">点击按钮, 或拖拽到此区域上传</div>-->
+            <div slot="tip">点击或拖拽上传, <br>支持jpg、jpeg、png格式的图片，大小不超过5M</div>
           </el-upload>
-          <div>支持jpg、png格式的图片，大小不超过5M</div>
+          <!--          <div >点击或拖拽上传, <br>支持jpg、jpeg、png格式的图片，大小不超过5M</div>-->
+
         </div>
         <!-- 已上传图片 -->
         <div v-show="options.img" class="avatar-crop">
@@ -53,12 +58,11 @@
         </div>
       </div>
       <span slot="footer" class="dialog-footer"></span>
-      <div class="reupload" @click="reupload">
-        <span v-show="options.img">重新上传</span>
-      </div>
-      <div>
+
+      <div style="margin-top: 10px">
         <el-button @click="closeDialog">取 消</el-button>
-        <el-button type="primary" @click="getAndSendCrop">确 定</el-button>
+        <el-button v-show="options.img" @click="reupload">重新上传</el-button>
+        <el-button v-show="options.img" type="primary" @click="confirmAndSend">确 定</el-button>
       </div>
     </el-dialog>
 
@@ -67,7 +71,9 @@
 </template>
 
 <script>
-import {VueCropper} from 'vue-cropper'
+import {VueCropper} from 'vue-cropper';
+import md5 from 'js-md5';
+import $ from 'jquery';
 
 export default {
   name: "AvatarSettings",
@@ -82,15 +88,17 @@ export default {
         autoCrop: true, // 默认生成截图框
         fixedBox: false, // 固定截图框大小
         canMoveBox: true, // 截图框可以拖动
-        autoCropWidth: 200, // 截图框宽度
-        autoCropHeight: 200, // 截图框高度
+        // autoCropWidth: 200, // 截图框宽度
+        // autoCropHeight: 200, // 截图框高度
         fixed: true, // 截图框宽高固定比例
         fixedNumber: [1, 1], // 截图框的宽高比例
         centerBox: true, // 截图框被限制在图片里面
         canMove: false, // 上传图片不允许拖动
         canScale: false, // 上传图片不允许滚轮缩放
-        outputSize: 0.1
-      }
+        outputSize: 1
+      },
+      // imgSrc: 'https://alifile.sunyujun.com/zuke/avatars/7b7d771f683058602af7a5f215f8708.jpg',
+      imgSrc: this.$store.state.userStore.avatarSrc
 
     };
   },
@@ -101,7 +109,7 @@ export default {
       const isIMAGE = file.raw.type === 'image/jpeg'
           || file.raw.type === 'image/jpg'
           || file.raw.type === 'image/png'
-      const isLt5M = file.raw.size / 1024 / 1024 < 5
+      const isLt3M = file.raw.size / 1024 / 1024 < 3
       if (!isIMAGE) {
         this.$message({
           showClose: true,
@@ -110,10 +118,10 @@ export default {
         })
         return false
       }
-      if (!isLt5M) {
+      if (!isLt3M) {
         this.$message({
           showClose: true,
-          message: '图片大小不能超过 5MB',
+          message: '图片大小不能超过 3MB',
           type: 'warning'
         })
         return false
@@ -125,18 +133,36 @@ export default {
       }
     },
     // 获取截图信息
-    getAndSendCrop() {
+    confirmAndSend() {
+      let avatarDTO = {
+        userId: '',
+        avatarData: '',
+        fileName: ''
+      }
+      let currentUser = this.$store.state.userStore.currentUser;
+      let fileType = ''
       // 获取截图的 base64 数据
-      // this.$refs.cropper.getCropData((data) => {
-      // console.log(data)
-      //   this.closeDialog()
-      // });
-      // console.log("获取blob ....")
+      this.$refs.cropper.getCropData((data) => {
+        // console.log("base64", data);
+        avatarDTO.avatarData = data;
+      });
+
       // // 获取截图的 blob 数据
       this.$refs.cropper.getCropBlob(data => {
-        console.log(data)
-        this.closeDialog()
-      })
+        console.log("blob", data)
+        fileType = data.type.split("/")[1];
+        let arrayBuffer = data.arrayBuffer();
+        console.log(arrayBuffer)
+        // 构建DTO对象,
+        avatarDTO.userId = currentUser.id
+        // avatarDTO.fileName = '' + md5(currentUser.id + currentUser.username) + "." + fileType;
+        // 后缀不要了, 后端统一作修改.
+        avatarDTO.fileName = '' + md5(currentUser.id + currentUser.username);
+        console.log('DTO: ~ ~ ~')
+        this.sendAvatar(avatarDTO);
+      });
+      this.closeDialog();
+
     },
     // 重新上传
     reupload() {
@@ -146,6 +172,35 @@ export default {
     closeDialog() {
       this.dialogVisible = false
       this.options.img = ''
+    },
+    sendAvatar(avatarDTO){
+      console.log(avatarDTO);
+      let _this = this;
+      let url = this.$store.state.constsStore.backEndHost + '/upload_avatar'
+      $.ajax(url, {
+        type: "POST",
+        data: JSON.stringify(avatarDTO),
+        // async: !noAsync, // 此处没有阻止异步的理由.
+        xhrFields: {
+          withCredentials: true
+        },
+        // 设置为JSON, 方便后端封装对象, 默认的application/x-www-form-urlencoded表单格式会把数据拼接到路径, hein不方便
+        dataType: 'text', // 返回字符串即可, 没必要设置为json? 一会儿看看吧, 要不要从数据库返回访问路径
+        contentType: 'application/json',
+        crossDomain: true,
+        success: function () {
+          console.log(" --- 头像上传成功")
+          _this.$message.success("头像上传成功")
+        },
+        error: function () {
+          _this.$message.error("头像上传失败~")
+        }
+
+
+      })
+
+
+
     }
 
   }
@@ -159,7 +214,7 @@ export default {
 }
 
 .choose-btn {
-  margin-top: 60px;
+  margin-top: 80px;
   margin-bottom: 10px;
 }
 
@@ -172,6 +227,7 @@ export default {
   .reupload {
     color: #409eff;
     cursor: pointer;
+    margin: 10px 0;
   }
 }
 
