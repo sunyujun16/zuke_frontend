@@ -1,23 +1,24 @@
 export default {
-    namespaced:true,
+    namespaced: true,
     strict: true,
-    actions:{
-
-    },
-    mutations:{
-        SET_USER(state, user){
+    actions: {},
+    mutations: {
+        SET_USER(state, user) {
             state.currentUser = user
         },
-        SET_ONLINE(state, ifOnLine){
+        SET_ONLINE(state, ifOnLine) {
             console.log("修改online: ", ifOnLine)
             state.onLine = ifOnLine
         },
-        SET_AVATAR_SRC(state, src){
+        SET_AVATAR_SRC(state, src) {
             state.avatarSrc = src
+        },
+        FLIP_AVATAR_FLAG(state) {
+            state.avatarFlag = !state.avatarFlag
         }
 
     },
-    state:{
+    state: {
         onLine: false,
         defaultUser: {
             id: '007',
@@ -46,10 +47,9 @@ export default {
             blank: '',
         },
         // avatarSrc: 'https://alifile.sunyujun.com/zuke/avatars/0363d297617871b822e497b08a813c61.jpg'
-        avatarSrc: '',
+        avatarSrc: require('../assets/img/header/avatar.png'),
+        avatarFlag: true,
 
     },
-    getters:{
-
-    }
+    getters: {}
 }

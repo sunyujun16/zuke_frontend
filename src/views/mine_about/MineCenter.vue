@@ -57,7 +57,7 @@ export default {
   data() {
     return {
       tagNames: [''],
-      lastTag: 'message',
+      lastTag: '',
     }
   },
   computed: {
@@ -71,7 +71,9 @@ export default {
       // console.log('- ' + tagName.toUpperCase() + ' - tag clicked.')
       if (this.activeTagName !== tagName) {
         this.SET_ACTIVE_TAG_NAME(tagName)
-        this.$router.push('/mine/' + tagName)
+        this.$router.push({
+          path: '/mine/' + tagName,
+        })
         return
       }
 
@@ -80,7 +82,7 @@ export default {
     restoreLast() {
       // 到上一次的标签,
       console.log("mine_activated", "active:", this.activeTagName, " -- last:", this.lastTag)
-      if (this.activeTagName !== this.lastTag) {
+      if (this.activeTagName !== this.lastTag && this.lastTag !== '') {
         console.log("切 -- ")
         this.toggleTag(this.lastTag)
       }

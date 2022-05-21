@@ -1,7 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-
 import elements from './elements/index'
 Vue.use(elements)
 

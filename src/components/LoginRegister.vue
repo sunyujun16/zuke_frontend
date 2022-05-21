@@ -282,17 +282,20 @@ export default {
     let userObj = JSON.parse(localStorage.getItem('userObj'));
     if (userObj) {
       let url = this.$store.state.constsStore.backEndHost + "/sniff"
-      // 发送嗅探
-      this.$axios.get(url)
+      // 发送嗅探 携带 cookies
+      this.$axios.get(url,{
+        withCredentials: true
+      })
           .then(res => {
             console.log("\n通信已存在, 自动登录 ...")
             _this.onLogin(userObj)
-          }).catch(e => {
-        // 规定动作: 清理sessionStorage, 修改state登录状态, currentUser信息等修改
-        localStorage.removeItem("userInfo")
-        this.SET_ONLINE(false)
-        this.SET_USER(this.defaultUser)
-      })
+          })
+          .catch(e => {
+            // 规定动作: 清理sessionStorage, 修改state登录状态, currentUser信息等修改
+            localStorage.removeItem("userInfo")
+            this.SET_ONLINE(false)
+            this.SET_USER(this.defaultUser)
+          })
     } else {
       console.log("未发现本地userObj, 无操作, 正常加载页面 ...")
     }

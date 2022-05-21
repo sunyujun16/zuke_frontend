@@ -1,13 +1,14 @@
 <template>
   <div id="avatar_menu_container" @mouseenter="showMenuController()" @mouseleave="showMenu = false">
-    <img id="avatar_ico"
+    <img v-if="avatarFlag"
+         id="avatar_ico"
          alt="avatar-icon"
          :title="avatarTitle"
          :src="avatarSrc"
          @click="toggleLR"
     >
-<!--    <span v-show="!onLine" style="margin-left: 10px; font-size: 12px; color: white; display: inline-block;-->
-<!--     height: 60px">登录/注册</span>-->
+    <!--    <span v-show="!onLine" style="margin-left: 10px; font-size: 12px; color: white; display: inline-block;-->
+    <!--     height: 60px">登录/注册</span>-->
 
     <transition name="avt-dropdown">
       <div class="zk-avatar-dropdown" v-show="showMenu">
@@ -36,6 +37,7 @@
 <script>
 import {mapMutations, mapState} from "vuex";
 import md5 from 'js-md5';
+import $ from 'jquery';
 
 export default {
   name: "Avatar",
@@ -43,14 +45,14 @@ export default {
   data() {
     return {
       showMenu: false,
-      avatarSrc: require('../assets/img/header/avatar.png'),
+      // avatarSrc: require('../assets/img/header/avatar.png'),
       avatarTitle: '登录/注册',
     }
   },
   computed: {
-    ...mapState("userStore", ['onLine','defaultUser', 'currentUser']),
-    userType(){
-      switch (this.currentUser.userType){
+    ...mapState("userStore", ['onLine', 'defaultUser', 'currentUser', 'avatarSrc', 'avatarFlag']),
+    userType() {
+      switch (this.currentUser.userType) {
         case 0:
           return "上帝(管理员)"
         case 1:
@@ -66,18 +68,42 @@ export default {
 
   },
   watch: {
-    onLine(){
-      if (this.onLine){
+    onLine() {
+      if (this.onLine) {
+        let _this = this;
         console.log("Avatar: 监听到Online为true ... ")
-        this.avatarSrc =
-            "https://alifile.sunyujun.com/zuke/avatars/"
-            + md5(this.currentUser.id + this.currentUser.username) + '.jpg';
-        this.SET_AVATAR_SRC(this.avatarSrc)
-      } else {
-        this.avatarSrc = require('../assets/img/header/avatar.png')
-        this.SET_AVATAR_SRC('')
-      }
+        let url = this.$store.state.constsStore.backEndHost + "/get_avatar_file_name?uid=" + this.currentUser.id
+        // 一登录, 马上发请求, 索要头像地址并设置好store, 以便其它使用头像的地方可以监听到,
+        $.ajax(url, {
+          type: "GET",
+          async: true,
+          xhrFields: {
+            withCredentials: true
+          },
+          dataType: 'text', // 返回字符串即可, 没必要设置为json? 一会儿看看吧, 要不要从数据库返回访问路径
+          crossDomain: true,
+          success: function (res) {
+            console.log("服务器返回avatar名称: ", res, ".jpg")
+            if (res)
+              _this.SET_AVATAR_SRC("https://alifile.sunyujun.com/zuke/avatars/"
+                  + res + '.jpg')
+            else
+              console.log("res为空, 数据库无头像信息");
+          },
+          error: function () {
+            console.log("完犊子喽, 获取头像文件名失败 ...")
+          }
 
+        })
+
+
+      } else {
+        // this.avatarSrc = require('../assets/img/header/avatar.png')
+        this.SET_AVATAR_SRC(require('../assets/img/header/avatar.png'))
+      }
+    },
+    avatarFlag(v) {
+      this.$forceUpdate()
     }
   },
   methods: {
@@ -111,6 +137,8 @@ export default {
               _this.$message.error("服务端未知错误")
           },
           error => {
+            if (error.response.status === 401)
+              _this.$message.error("已掉线" + error.response.data)
             _this.$message.error("服务器端退出异常" + error.response.data)
           })
 
@@ -193,6 +221,7 @@ export default {
 .dropdown-body span:hover {
   background-color: var(--grey5);
 }
+
 .dropdown-body span:active {
   background-color: var(--grey9);
 }

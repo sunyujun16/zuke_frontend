@@ -1,9 +1,10 @@
 <template>
   <div class="avatar-upload-container">
     <div>
-      <img :src="imgSrc" alt="avatar" style="height: 200px; margin-bottom: 10px">
+      <img v-if="avatarFlag" :src="avatarSrc" alt="avatar"
+           class="zuke-current-avatar">
     </div>
-    <el-button @click="dialogVisible = true">上传头像</el-button>
+    <el-button @click="dialogVisible = true">上传新头像</el-button>
     <!--    <span style="font-size: 12px">仅支持png, jpg, jpeg, 图像大小不超过3M</span>-->
     <el-dialog
         title="裁剪头像"
@@ -31,7 +32,7 @@
               选择图片
             </el-button>
             <!--            <div slot="trigger" style="position: relative;">点击按钮, 或拖拽到此区域上传</div>-->
-            <div slot="tip">点击或拖拽上传, <br>支持jpg、jpeg、png格式的图片，大小不超过5M</div>
+            <div slot="tip">点击或拖拽上传, <br>支持jpg、jpeg、png格式的图片，大小不超过3M</div>
           </el-upload>
           <!--          <div >点击或拖拽上传, <br>支持jpg、jpeg、png格式的图片，大小不超过5M</div>-->
 
@@ -54,13 +55,41 @@
               :canMove="options.canMove"
               :canScale="options.canScale"
               :outputSize="options.outputSize"
+              @realTime = realTime
           ></vueCropper>
         </div>
       </div>
+
+      <div>
+
+<!--        <div class="show-preview"-->
+<!--             :style="{'width': previews.w + 'px', 'height': previews.h + 'px',-->
+<!--           'overflow': 'hidden', 'margin': '5px'}">-->
+<!--          <div :style="previews.div">-->
+<!--            <img :src="options.img" :style="previews.img">-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <p>中等大小</p>-->
+<!--        <div :style="previewStyle1">-->
+<!--          <div :style="previews.div">-->
+<!--            <img :src="previews.url" :style="previews.img">-->
+<!--          </div>-->
+<!--        </div>-->
+
+<!--        <span>预览</span>-->
+<!--        <div :style="previewStyle2">-->
+<!--          <div :style="previews.div">-->
+<!--            <img :src="previews.url" :style="previews.img" alt="预览">-->
+<!--          </div>-->
+<!--        </div>-->
+
+      </div>
+
+
       <span slot="footer" class="dialog-footer"></span>
 
       <div style="margin-top: 10px">
-        <el-button @click="closeDialog">取 消</el-button>
+        <el-button @click="closeDialog" type="danger">取 消</el-button>
         <el-button v-show="options.img" @click="reupload">重新上传</el-button>
         <el-button v-show="options.img" type="primary" @click="confirmAndSend">确 定</el-button>
       </div>
@@ -74,6 +103,8 @@
 import {VueCropper} from 'vue-cropper';
 import md5 from 'js-md5';
 import $ from 'jquery';
+import {mapMutations, mapState} from "vuex";
+import Vue from 'vue'
 
 export default {
   name: "AvatarSettings",
@@ -97,14 +128,19 @@ export default {
         canScale: false, // 上传图片不允许滚轮缩放
         outputSize: 1
       },
-      // imgSrc: 'https://alifile.sunyujun.com/zuke/avatars/7b7d771f683058602af7a5f215f8708.jpg',
-      imgSrc: this.$store.state.userStore.avatarSrc
+      previews: {},
+      previewStyle2: {}
 
     };
   },
+  computed: {
+    ...mapState('userStore', ['avatarSrc', 'avatarFlag'])
+  },
   methods: {
+    ...mapMutations('userStore', ['SET_AVATAR_SRC', 'FLIP_AVATAR_FLAG']),
     // 读取原图
     upload(file) {
+      this.$message.info("图片加载完毕")
       console.log(file)
       const isIMAGE = file.raw.type === 'image/jpeg'
           || file.raw.type === 'image/jpg'
@@ -134,6 +170,7 @@ export default {
     },
     // 获取截图信息
     confirmAndSend() {
+      let _this = this
       let avatarDTO = {
         userId: '',
         avatarData: '',
@@ -157,11 +194,28 @@ export default {
         avatarDTO.userId = currentUser.id
         // avatarDTO.fileName = '' + md5(currentUser.id + currentUser.username) + "." + fileType;
         // 后缀不要了, 后端统一作修改.
-        avatarDTO.fileName = '' + md5(currentUser.id + currentUser.username);
+        avatarDTO.fileName = '' + md5(Date.now().toString()) + currentUser.username;
         console.log('DTO: ~ ~ ~')
+        // 发送请求, 在内部处理返回的fileName.
         this.sendAvatar(avatarDTO);
+
+        // 通过v-if的延时切换, 触发头像的刷新. -- 取消, 直接返回字符串覆盖掉头像src好了
+        // this.FLIP_AVATAR_FLAG();
+        // setTimeout(() => {
+        //   // _this.$forceUpdate()
+        //   _this.FLIP_AVATAR_FLAG();
+        //   _this.$message.info("强制刷新执行???")
+        // }, 1000)
       });
       this.closeDialog();
+
+
+      // let src = this.avatarSrc;
+      // this.SET_AVATAR_SRC('')
+      // this.$nextTick(()=>{
+      //   this.SET_AVATAR_SRC(src)
+      // })
+
 
     },
     // 重新上传
@@ -173,24 +227,28 @@ export default {
       this.dialogVisible = false
       this.options.img = ''
     },
-    sendAvatar(avatarDTO){
+    sendAvatar(avatarDTO) {
       console.log(avatarDTO);
       let _this = this;
       let url = this.$store.state.constsStore.backEndHost + '/upload_avatar'
+      _this.$message.info("头像上传中 ... ")
       $.ajax(url, {
         type: "POST",
         data: JSON.stringify(avatarDTO),
-        // async: !noAsync, // 此处没有阻止异步的理由.
+        async: false, // 此处阻止异步是为了避免阿里云没刷新完, 或数据库没更新, 就执行浏览器的图片刷新. 所以等待返回值, 再进行后续处理.
         xhrFields: {
           withCredentials: true
         },
         // 设置为JSON, 方便后端封装对象, 默认的application/x-www-form-urlencoded表单格式会把数据拼接到路径, hein不方便
-        dataType: 'text', // 返回字符串即可, 没必要设置为json? 一会儿看看吧, 要不要从数据库返回访问路径
         contentType: 'application/json',
+        dataType: 'text', // 返回字符串即可, 没必要设置为json? 一会儿看看吧, 要不要从数据库返回访问路径
         crossDomain: true,
-        success: function () {
+        success: function (res) {
           console.log(" --- 头像上传成功")
           _this.$message.success("头像上传成功")
+          console.log("Settings 里的 res: ", res)
+          _this.SET_AVATAR_SRC("https://alifile.sunyujun.com/zuke/avatars/"
+              + avatarDTO.fileName + '.jpg')
         },
         error: function () {
           _this.$message.error("头像上传失败~")
@@ -200,7 +258,33 @@ export default {
       })
 
 
+    },
+    realTime(data) {
+      var previews = data
+      var h = 0.5
+      var w = 0.5
 
+      let theStyle = document.getElementsByClassName("cropper-crop-box")[0].style;
+      let theStyle2 = document.getElementsByClassName("cropper-face")[0].style;
+      // theStyle.backgroundColor = 'rgba(1,1,1,0.4)';
+      // theStyle.color = 'white';
+      // theStyle.borderRight = '3px solid red'
+      theStyle.borderRadius = previews.w + 'px'
+      theStyle.overflow = 'hidden'
+      // theStyle2.borderRadius = '50px'
+
+      // 预览小窗口, 不需要了, 上面直接原生JS修改style
+      // this.previewStyle2 = {
+      //   width: previews.w + "px",
+      //   height: previews.h + "px",
+      //   overflow: "hidden",
+      //   margin: "0",
+      //   zoom: 100 / previews.w,
+      //   // borderRadius: previews.w / 2 + "px",
+      //   borderRadius: previews.w / 2 + "px",
+      //   display: "inline-block"
+      // }
+      // this.previews = data
     }
 
   }
@@ -210,7 +294,13 @@ export default {
 <style lang="scss" scoped>
 .avatar-upload-container {
   text-align: left;
+}
 
+.zuke-current-avatar {
+  height: 200px;
+  margin-bottom: 10px;
+  background-color: var(--grey3);
+  border-radius: 100px;
 }
 
 .choose-btn {
@@ -256,6 +346,15 @@ export default {
       height: 100%;
       border-radius: 4px;
       overflow: hidden;
+
+      .cropper-crop-box {
+        border-radius: 100px;
+
+        //.cropper-face {
+        //  border-radius: 100px;
+        //}
+      }
+
     }
 
   }

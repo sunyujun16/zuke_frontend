@@ -3,8 +3,16 @@
 </template>
 
 <script>
+import {mapMutations} from "vuex";
+
 export default {
-  name: "MyComments"
+  name: "MyComments",
+  methods: {
+    ...mapMutations('detailsStore', ['SET_ACTIVE_TAG_NAME']),
+  },
+  beforeMount() {
+    this.SET_ACTIVE_TAG_NAME('comments')
+  }
 }
 </script>
 
